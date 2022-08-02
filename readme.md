@@ -225,3 +225,45 @@ import axios from 'axios'
 ---
 
 ## Query by id
+
+-new custome hook\
+-use it with useparams from react-router\
+-add the id in the first parameter of the query hook with an array because key + id :
+
+        import { useQuery } from 'react-query'
+        import axios from 'axios'
+
+        export const useSuperHeroData = (heroId) => {
+                return useQuery(['super-hero',heroId], () => fetchSuperHero(heroId))
+        }
+
+-fecthSuperHeroId need to accept the id as param so arrow function 
+
+-create the const with the request
+
+        const fetchSuperHero = (heroId) => {
+                return axios.get('http://localhost:4000/superheroes/${heroId})
+        }
+
+-then use the custom hook in the component:
+
+        import { useParams } from 'react-router-dom'
+        import { useSuperHeroData } from '../hooks/useSuperHeroData'
+
+        export const RQSuperHeroPage = () => {
+        const { heroId } = useParams()
+        const { isLoading, data, isError, error } = useSuperHeroData(heroId)
+
+        if (isLoading) {
+        return <h2>Loading...</h2>
+        }
+
+        if (isError) {
+        return <h2>{error.message}</h2>
+        }
+        return (
+        <div>
+        {data.data.name} - {data.data.alterEgo}
+        </div>
+        )
+        }
