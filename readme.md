@@ -344,3 +344,117 @@ juste remember that you have twos results, so twos data, just redefine them
         //send directly some JSX
         return <div>DependentQueries</div>
         }
+
+---
+
+## Initial query data
+-if you made a request and obtain a result that you can use in an other component, you can do it without making the request, just uploading it from react query \
+-import useQueryClient \
+-call and save it 
+
+        const queryClient = useQueryClient()
+
+        -then same syntax than classic query, only add initialData in the option object:
+
+        export const useSuperHeroData = heroId => {
+        const queryClient = useQueryClient()
+        return useQuery(['super-hero', heroId], fetchSuperHero, {
+        initialData: () => {
+
+        //if super-heroes result is available, then find + save it
+
+        const hero = queryClient.getQueryData('super-heroes')
+                ?.data?.find(hero => hero.id === parseInt(heroId))
+        if (hero) {
+                return { data: hero }
+
+        //obligation to return undefined if no result
+
+        } else {
+                return undefined
+        }
+        }
+        })
+        }
+
+---
+
+## Paginated Queries
+
+-limit of result is setup in the request, paginated setting in a dynamic way (just check if its compatible with the back)\
+-import { useState } from 'react' (will be used to give the number of pages)
+
+        const [pageNumber, setPageNumber] = useState(1)
+
+-add pageNumber is the array as first parameter, add it to the function too
+
+        
+        const fetchColors = pageNumber => {
+        return axios.get(`http://localhost:4000/colors?_limit=2&_page=${pageNumber}`)
+        }
+
+        const { isLoading, isError, error, data, isFetching } =         useQuery(
+        ['colors', pageNumber],
+        () => fetchColors(pageNumber),
+        {
+        keepPreviousData: true
+        }
+        )
+
+-keepPreviousData will allow react query to keept the result of the last request\
+-and find an exemple of JSX buttons to get more or less result on your app\
+-the query fecth is done automatically when the state pageNumber change?
+
+
+        <button
+                onClick={() => setPageNumber(page => page - 1)}
+                disabled={pageNumber === 1}>
+                Prev Page
+        </button>
+        <button
+                onClick={() => setPageNumber(page => page + 1)}
+                disabled={pageNumber === 4}>
+                Next Page
+        </button>
+
+---
+
+## Infinite Queries
+-useInfiniteQuery hook
+
+        const fetchColors = ({ pageParam = 1 }) => {
+        return axios.get(`http://localhost:4000/colors?_limit=2&_page=${pageParam}`)
+        }
+
+        const {
+                isLoading,
+                isError,
+                error,
+                data,
+                fetchNextPage,
+                hasNextPage,
+                isFetching,
+                isFetchingNextPage
+        } = useInfiniteQuery(['colors'], fetchColors, {
+        getNextPageParam: (_lastPage, pages) => {
+                if (pages.length < 4) {
+                        //hasNextPage = true
+                        return pages.length + 1
+                } else {
+                        //hasNextPage = false
+                        return undefined
+                }
+        }
+        })
+
+- fetchNextPage and hasNextPage, are usefull for the JSX they indicate a state for hasNextPage and a function to call for fetchNextPage
+
+        <button onClick={() => fetchNextPage()} disabled={!hasNextPage}>
+                Load more
+        </button>
+
+---
+
+## Mutations
+-post request
+-import { useMutation } from 'react-query'
