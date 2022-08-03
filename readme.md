@@ -267,3 +267,80 @@ import axios from 'axios'
         </div>
         )
         }
+
+---
+
+## Parallel queries
+-possibility to make severals queries in one function: 
+
+        export const ParallelQueriesPage = () => {
+        const { data: superHeroes } = useQuery('super-heroes', fetchSuperHeroes)
+        const { data: friends } = useQuery('friends', fetchFriends)
+        console.log(superHeroes, friends)
+        return <div>Parallel Queries</div>
+        }
+
+juste remember that you have twos results, so twos data, just redefine them
+
+---
+
+## Dynamic parallele queries
+-import {useQueries} from 'react-query' (and not {useQuery})\
+-the hookuseQueries has a different syntax:
+
+        const fetchSuperHero = heroId => {
+        return axios.get(`http://localhost:4000/superheroes/${heroId}`)
+        }
+
+        export const DynamicParallelPage = ({ heroIds }) => {
+        const queryResults = useQueries(
+        heroIds.map(id => {
+        return {
+                queryKey: ['super-hero', id],
+                queryFn: () => fetchSuperHero(id)
+        }
+        })
+        )
+
+        console.log({ queryResults })
+        return <div>Dynamic Parallel Queries</div>
+        }
+
+-the hook useQueries give the possibility to loop in an array and fetch at each index\
+-the querykey (first params in classic query) is in the object returned, and the function (second params) is in the object too. 
+-the result will be an array
+
+---
+
+## Dependent queries
+-fetch a request, and use the result to make an other request using the result of previous request
+
+        const fetchUserByEmail = email => {
+        return axios.get(`http://localhost:4000/users/${email}`)
+        }
+
+        const fetchCoursesByChannelId = channelId => {
+        return axios.get(`http://localhost:4000/channels/${channelId}`)
+        }
+
+        export const DependentQueriesPage = ({ email }) => {
+
+        //i obtain the result of my first request
+
+        const { data: user } = useQuery(['user', email], () =>
+        fetchUserByEmail(email)
+        )
+
+        //using the result first request to make my second resquest
+        //if user is true and data too, then use user.data.channeliD
+        
+        const channelId = user?.data?.channelId
+        useQuery(['courses', channelId], () => fetchCoursesByChannelId(channelId), {
+
+        //this request is using the result of the first request, so if the first request is not done, the result of this one will be undefined, then i need to set up as enabled if channelId is false
+
+        enabled: !!channelId
+        })
+        //send directly some JSX
+        return <div>DependentQueries</div>
+        }
