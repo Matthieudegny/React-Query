@@ -543,3 +543,18 @@ export const useAddSuperHeroData = () => {
 ---
 
 ## Optimistic updates
+https://daily-dev-tips.com/posts/react-query-and-optimistic-updates/
+-update the state before performing a mutation under the assumption that nothing can go wrong\
+-need three callbacks onMutate, onError, onSettled\
+-onMute is called before the mutation function is fired and is passed the same variables (as params hero -> newHero) the mutation function would receive\
+-in the onMute cancel any request so they don't overwrite our optimistic update (cancel query method) the params is the query key that i would cancel !warning! async function\
+-in case the mutation fails, we need the current query data before we make any update -> get query method on the query client instance\
+-update the query data with set query data (in the exemple an id has been added)
+-so now the data are updated without making any post request\
+-onError: recieves three arguments, first argument: the error that ws encountered, (not needed in the exemple so _error), second argument: the variables passed into the mutation (same not needed _hero), third argument context contains additional information pertaining to the mutation, thanks it we can take the data from the call back and set it as the query data when there is an error\
+-onSettled: this function is called if the mutation is either successful or when it encounters an error
+
+---
+
+## Axios interceptor
+-react query has nothing to do with axios
