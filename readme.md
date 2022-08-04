@@ -454,7 +454,7 @@ juste remember that you have twos results, so twos data, just redefine them
         </button>
 
 ---
-
+documentation Mutation : https://tkdodo.eu/blog/mastering-mutations-in-react-query
 ## Mutations
 -post request \
 -creation of the custom mutation hook\
@@ -511,3 +511,35 @@ export const useAddSuperHeroData = () => {
                 /** use the same key as the one used in the hook tha called the data (return useQuery('super-heroes', fetchSuperHeroes, {...), thanks this invalidateQueries the data will be directly updated in the component */
                 queryClient.invalidateQueries('super-heroes')
         }
+
+---
+
+## Handling Mutation Response
+
+-difference betwwen invalidation and setQueryData = invalidation is less code on the frontend, but one more network request. That's the tradeoff.
+-we gonna use the addSuperHero response to update the superHeroesQuery datas thereby saving an additional network request
+-comment out the query invalidation (no aditionnal request)
+-make use of the data returned from mutation (useAddSuperHeroData())
+-if the request mutation is success it recieve data as response
+-on the queryClient instance we call a method called setQueryData -> allow to update the query cache. The first argument is the query key, second argument is a function, this function recieve the old query data as an argument (its in the query cache).then we need to transform the old query data to a new value (with data from mutation)
+
+        export const useAddSuperHeroData = () => {
+        const queryClient = useQueryClient()
+
+        return useMutation(addSuperHero, {
+        onSuccess: (data) => {
+
+                //queryClient.invalidateQueries('super-heroes')
+                
+                queryClient.setQueryData('super-heroes', (oldQueryData) => {
+                return {
+                ...oldQueryData,
+                //oldQueryData.data = data in cache from 'super-heroes'
+                //data.data = new data inhect with form
+                data: [...oldQueryData.data, data.data]
+        }
+        })
+
+---
+
+## Optimistic updates
