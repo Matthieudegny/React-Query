@@ -456,5 +456,58 @@ juste remember that you have twos results, so twos data, just redefine them
 ---
 
 ## Mutations
--post request
--import { useMutation } from 'react-query'
+-post request \
+-creation of the custom mutation hook\
+
+        import { useMutation } from 'react-query'
+
+        const addSuperHero = (hero) => {
+                return axios.post('http://localhost:4000/superheroes', hero)
+        }
+
+        export const useAddSuperHeroData = () => {
+                return useMutation(addSuperHero)
+        }
+
+-call the custom hook from my component
+
+        import {
+        useAddSuperHeroData,
+        } from '../hooks/useSuperHeroesData'
+
+
+        const { mutate: addHero } = useAddSuperHeroData()
+        //or
+        //const { mutate: addHero, isLoading, isError, error } = useAddSuperHeroData()
+
+        const handleAddHeroClick = () => {
+                //informations i get
+                console.log({name,alterEgo})
+                //save it in  a variable
+                const hero = { name, alterEgo }
+                //usualy would be mutate(hero)
+                //but in case there is differents mutation call
+                //its better to redefine it
+                addHero(hero)
+        }
+
+---
+
+## Query invalidation
+-after a post the data change, the goal with query invalidation is to update automaticly the new state\
+-get back in my custom mutation hook\
+-import { useQuery, useMutation, useQueryClient } from 'react-query'\
+-and call it in my function useAddSuperHerorData 
+
+        const queryClient = useQueryClient()
+
+-need to be get hold by the success of the useMutation hook, for that we use a second params
+
+export const useAddSuperHeroData = () => {
+  const queryClient = useQueryClient()
+
+        return useMutation(addSuperHero, {
+        onSuccess: data => {
+                /** use the same key as the one used in the hook tha called the data (return useQuery('super-heroes', fetchSuperHeroes, {...), thanks this invalidateQueries the data will be directly updated in the component */
+                queryClient.invalidateQueries('super-heroes')
+        }
