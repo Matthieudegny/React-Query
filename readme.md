@@ -402,7 +402,7 @@ juste remember that you have twos results, so twos data, just redefine them
         )
 
 -keepPreviousData will allow react query to keept the result of the last request\
--and find an exemple of JSX buttons to get more or less result on your app\
+-find an exemple of JSX buttons to get more or less result on your app\
 -the query fecth is done automatically when the state pageNumber change?
 
 
@@ -554,7 +554,3 @@ https://daily-dev-tips.com/posts/react-query-and-optimistic-updates/
 -onError: recieves three arguments, first argument: the error that ws encountered, (not needed in the exemple so _error), second argument: the variables passed into the mutation (same not needed _hero), third argument context contains additional information pertaining to the mutation, thanks it we can take the data from the call back and set it as the query data when there is an error\
 -onSettled: this function is called if the mutation is either successful or when it encounters an error
 
----
-
-## Axios interceptor
--react query has nothing to do with axios

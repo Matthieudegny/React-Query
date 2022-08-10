@@ -12,12 +12,15 @@ export const InfiniteQueriesPage = () => {
     isError,
     error,
     data,
+    //fetchNextPage is the event target (onClick) as Refetch
     fetchNextPage,
+    //there is a link between hasNextPage and getNextPageParam
     hasNextPage,
     isFetching,
     isFetchingNextPage
   } = useInfiniteQuery(['colors'], fetchColors, {
     getNextPageParam: (_lastPage, pages) => {
+      //allow to set hasNextPage as undefined and limited to 4 pages
       if (pages.length < 4) {
         return pages.length + 1
       } else {
@@ -33,7 +36,7 @@ export const InfiniteQueriesPage = () => {
   if (isError) {
     return <h2>{error.message}</h2>
   }
-
+//data.pages and group + index are from useInfinteQuery
   return (
     <>
       <div>
